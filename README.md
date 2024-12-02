@@ -27,6 +27,7 @@ University of Bologna<sup>2</sup>
 - [:inbox\_tray: Pretrained Models](#inbox_tray-pretrained-models)
 - [:memo: Code](#memo-code)
 - [:floppy_disk: Datasets](#floppy_disk-datasets)
+- [:train2: Training](#train2-training)
 - [:rocket: Test](#rocket-test)
 - [:art: Qualitative Results](#art-qualitative-results)
 - [:envelope: Contacts](#envelope-contacts)
