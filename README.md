@@ -18,6 +18,9 @@ University of Bologna<sup>2</sup>
  [Project Page](https://stereoanywhere.github.io/) | [Paper](https://arxiv.org/) 
 </h2>
 
+<img src="./images/teaser.png" alt="Alt text" style="width: 800px;" title="architecture">
+<p style="text-align: justify;"><strong>Stereo Anywhere: Combining Monocular and Stereo Strenghts for Robust Depth Estimation.</strong> Our model achieves accurate results on standard conditions (on Middlebury), while effectively handling non-Lambertian surfaces where stereo networks fail (on Booster) and perspective illusions that deceive monocular depth foundation models (on MonoTrap, our novel dataset).</p>
+
 **Note**: 🚧 Kindly note that this repository is currently in the development phase. We are actively working to add and refine features and documentation. We apologize for any inconvenience caused by incomplete or missing elements and appreciate your patience as we work towards completion.
 
 ## :bookmark_tabs: Table of Contents
@@ -38,10 +41,6 @@ University of Bologna<sup>2</sup>
 ## :clapper: Introduction
 
 We introduce Stereo Anywhere, a novel stereo-matching framework that combines geometric constraints with robust priors from monocular depth Vision Foundation Models (VFMs). By elegantly coupling these complementary worlds through a dual-branch architecture, we seamlessly integrate stereo matching with learned contextual cues. Following this design, our framework introduces novel cost volume fusion mechanisms that effectively handle critical challenges such as textureless regions, occlusions, and non-Lambertian surfaces. Through our novel optical illusion dataset, MonoTrap, and extensive evaluation across multiple benchmarks, we demonstrate that our synthetic-only trained model achieves state-of-the-art results in zero-shot generalization, significantly outperforming existing solutions while showing remarkable robustness to challenging cases such as mirrors and transparencies.
-
-
-<img src="./images/teaser.png" alt="Alt text" style="width: 800px;" title="architecture">
-<p style="text-align: justify;"><strong>Stereo Anywhere: Combining Monocular and Stereo Strenghts for Robust Depth Estimation.</strong> Our model achieves accurate results on standard conditions (on Middlebury), while effectively handling non-Lambertian surfaces where stereo networks fail (on Booster) and perspective illusions that deceive monocular depth foundation models (on MonoTrap, our novel dataset).</p>
 
 **Contributions:** 
 
