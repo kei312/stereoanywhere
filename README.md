@@ -26,7 +26,6 @@ University of Bologna<sup>2</sup>
 - [:clapper: Introduction](#clapper-introduction)
 - [:inbox\_tray: Pretrained Models](#inbox_tray-pretrained-models)
 - [:memo: Code](#memo-code)
-  - [:hammer\_and\_wrench: Setup Instructions](#hammer_and_wrench-setup-instructions)
 - [:floppy_disk: Datasets](#floppy_disk-datasets)
 - [:rocket: Test](#rocket-test)
 - [:art: Qualitative Results](#art-qualitative-results)
