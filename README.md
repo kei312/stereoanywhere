@@ -2,7 +2,7 @@
 
 <br>
 
-:rotating_light: This repository will contain download links to our code, and trained deep stereo models of our work  "**Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail**",  [ArXiv](https://arxiv.org/)
+:rotating_light: This repository will contain download links to our code, and trained deep stereo models of our work  "**Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail**",  [ArXiv](http://arxiv.org/abs/2412.04472)
  
 by [Luca Bartolomei](https://bartn8.github.io/)<sup>1,2</sup>, [Fabio Tosi](https://fabiotosi92.github.io/)<sup>2</sup>, [Matteo Poggi](https://mattpoggi.github.io/)<sup>1,2</sup>, and [Stefano Mattoccia](https://github.com/stefano-mattoccia)<sup>1,2</sup>
 
@@ -15,7 +15,7 @@ University of Bologna<sup>2</sup>
 
  Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (ArXiv)<br>
 
- [Project Page](https://stereoanywhere.github.io/) | [Paper](https://arxiv.org/) 
+ [Project Page](https://stereoanywhere.github.io/) | [Paper](http://arxiv.org/abs/2412.04472) 
 </h2>
 
 <img src="./images/teaser.png" alt="Alt text" style="width: 800px;" title="architecture">
@@ -59,7 +59,7 @@ We introduce Stereo Anywhere, a novel stereo-matching framework that combines ge
 @article{bartolomei2024stereo,
   title={Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail},
   author={Bartolomei, Luca and Tosi, Fabio and Poggi, Matteo and Mattoccia, Stefano},
-  journal={arXiv preprint},
+  journal={arXiv preprint arXiv:2412.04472},
   year={2024},
 }
 ```
