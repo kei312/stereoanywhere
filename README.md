@@ -1,8 +1,10 @@
-<h1 align="center"> Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (ArXiv) </h1> 
+<h1 align="center"> Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (CVPR 2025) </h1> 
+
+<h3 align="center"> Code coming soon </h3>
 
 <br>
 
-:rotating_light: This repository will contain download links to our code, and trained deep stereo models of our work  "**Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail**",  [ArXiv](http://arxiv.org/abs/2412.04472)
+:rotating_light: This repository will contain download links to our code, and trained deep stereo models of our work  "**Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail**",  [CVPR 2025](http://arxiv.org/abs/2412.04472)
  
 by [Luca Bartolomei](https://bartn8.github.io/)<sup>1,2</sup>, [Fabio Tosi](https://fabiotosi92.github.io/)<sup>2</sup>, [Matteo Poggi](https://mattpoggi.github.io/)<sup>1,2</sup>, and [Stefano Mattoccia](https://github.com/stefano-mattoccia)<sup>1,2</sup>
 
@@ -13,7 +15,7 @@ University of Bologna<sup>2</sup>
 
 <h2 align="center"> 
 
- Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (ArXiv)<br>
+ Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (CVPR 2025)<br>
 
  [Project Page](https://stereoanywhere.github.io/) | [Paper](http://arxiv.org/abs/2412.04472) 
 </h2>
