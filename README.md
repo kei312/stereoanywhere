@@ -1,6 +1,6 @@
 <h1 align="center"> Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (CVPR 2025) </h1> 
 
-<h3 align="center"> Code coming soon </h3>
+<h3 align="center"> Evaluation code released - training code coming soon </h3>
 
 <br>
 
@@ -70,7 +70,7 @@ We introduce Stereo Anywhere, a novel stereo-matching framework that combines ge
 
 Here, you will be able to download the weights of our proposal trained on [Sceneflow](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html).
 
-The download link will be released soon.
+You can download our pretrained models [here](https://drive.google.com/drive/folders/1uQqNJo2iWoPtXlSsv2koAt2OPYHpuh1x?usp=sharing).
 
 ## :memo: Code
 
@@ -93,6 +93,18 @@ Details about datasets will be released soon.
 We will provide futher information to train Stereo Anywhere soon.
 
 ## :rocket: Test
+
+Evaluation command example:
+
+```bash
+python test.py --datapath <DATAPATH> --dataset <DATASET> \ 
+--stereomodel stereoanywhere --loadstereomodel <STEREO_MODEL_PATH> \
+--monomodel DAv2 --loadmonomodel <MONO_MODEL_PATH> \
+--iscale <ISCALE> --oscale <OSCALE> --normalize --iters 32 \
+--vol_n_masks 8 --n_additional_hourglass 0 \
+--use_aggregate_mono_vol --vol_downsample 0 \
+--mirror_conf_th 0.98  --use_truncate_vol --mirror_attenuation 0.9 
+```
 
 We will provide futher information to test Stereo Anywhere soon.
 
