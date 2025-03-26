@@ -29,24 +29,16 @@ class LayeredFlowDataset(BaseDataset):
     
     def load_sample(self, index):
         data = {}
+        
         if not self.is_test:
             raise NotImplementedError
-        data['im2'] = read_gen(self.image_list[index][0])
-        data['im3'] = read_gen(self.image_list[index][1])
-        
-        data['im2'] = np.array(data['im2']).astype(np.uint8) / 255.0
-        data['im3'] = np.array(data['im3']).astype(np.uint8) / 255.0
+                
+        data['im2'] = np.array(read_gen(self.image_list[index][0])).astype(np.uint8) / 255.0
+        data['im3'] = np.array(read_gen(self.image_list[index][1])).astype(np.uint8) / 255.0
 
         # grayscale images
-        if len(data['im2'].shape) == 2:
-            data['im2'] = np.tile(data['im2'][...,None], (1, 1, 3))
-        else:
-            data['im2'] = data['im2'][..., :3]                
-
-        if len(data['im3'].shape) == 2:
-            data['im3'] = np.tile(data['im3'][...,None], (1, 1, 3))
-        else:
-            data['im3'] = data['im3'][..., :3]
+        data['im2'] = self.gray2rgb(data['im2'])
+        data['im3'] = self.gray2rgb(data['im3'])
 
         data['gt'] = np.zeros_like(data['im2'], dtype=np.float32)[..., 0]
 

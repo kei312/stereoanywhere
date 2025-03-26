@@ -1,12 +1,12 @@
 <h1 align="center"> Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (CVPR 2025) </h1> 
 
-<h3 align="center"> Evaluation code released - training code coming soon </h3>
+<h3 align="center"> Evaluation code released - MonoTrap released - training code coming soon </h3>
 
 <br>
 
 :rotating_light: This repository will contain download links to our code, and trained deep stereo models of our work  "**Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail**",  [CVPR 2025](http://arxiv.org/abs/2412.04472)
  
-by [Luca Bartolomei](https://bartn8.github.io/)<sup>1,2</sup>, [Fabio Tosi](https://fabiotosi92.github.io/)<sup>2</sup>, [Matteo Poggi](https://mattpoggi.github.io/)<sup>1,2</sup>, and [Stefano Mattoccia](https://github.com/stefano-mattoccia)<sup>1,2</sup>
+by [Luca Bartolomei](https://bartn8.github.io/)<sup>1,2</sup>, [Fabio Tosi](https://fabiotosi92.github.io/)<sup>2</sup>, [Matteo Poggi](https://mattpoggi.github.io/)<sup>1,2</sup>, and [Stefano Mattoccia](https://stefanomattoccia.github.io/)<sup>1,2</sup>
 
 Advanced Research Center on Electronic System (ARCES)<sup>1</sup>
 University of Bologna<sup>2</sup>
@@ -74,7 +74,22 @@ You can download our pretrained models [here](https://drive.google.com/drive/fol
 
 ## :memo: Code
 
-Details about training and testing scripts will be released soon.
+The **Training** section provides a script to train our model using Sceneflow dataset, while our **Test** section contains scripts to evaluate disparity estimation on datasets like **KITTI**, **Middlebury**, **ETH3D**.
+
+Please refer to each section for detailed instructions on setup and execution.
+
+<div class="alert alert-info">
+
+**Warning**:
+
+- With the latest updates in PyTorch, slight variations in the quantitative results compared to the numbers reported in the paper may occur.
+
+</div>
+
+### :hammer_and_wrench: Setup Instructions
+
+1. **Dependencies**: Ensure that you have installed all the necessary dependencies. The list of dependencies can be found in the `./requirements.txt` file.
+2. **Set scripts variables**: Each script needs the path to the virtual environment (if any) and to the dataset. Please set those variables before running the script.
 
 
 ## :floppy_disk: Datasets
@@ -86,7 +101,172 @@ Specifically, we evaluate our proposal and competitors using:
 - two datasets **containing non-Lambertian** surfaces: [Booster](https://cvlab-unibo.github.io/booster-web/) and [LayeredFlow](https://layeredflow.cs.princeton.edu/);
 - and finally with **MonoTrap** our novel stereo dataset specifically designed to challenge monocular depth estimation.
 
-Details about datasets will be released soon.
+### Sceneflow - FlyingThings (subset)
+
+Download [Images](https://lmb.informatik.uni-freiburg.de/data/FlyingThings3D_subset/FlyingThings3D_subset_image_clean.tar.bz2.torrent) and [Disparities](https://lmb.informatik.uni-freiburg.de/data/FlyingThings3D_subset/FlyingThings3D_subset_disparity.tar.bz2.torrent) from the [official website](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html).
+
+Unzip the archives, then you will get a data structure as follows:
+
+```
+FlyingThings3D_subset
+├── val
+└── train
+    ├── disparity
+    │   ├── left
+    │   └── right
+    └── image_clean
+        ├── left
+        └── right
+```
+
+### Sceneflow - Monkaa
+
+Download [Images](https://lmb.informatik.uni-freiburg.de/data/SceneFlowDatasets_CVPR16/Release_april16/data/Monkaa/raw_data/monkaa__frames_cleanpass.tar) and [Disparities](https://lmb.informatik.uni-freiburg.de/data/SceneFlowDatasets_CVPR16/Release_april16/data/Monkaa/derived_data/monkaa__disparity.tar.bz2) from the [official website](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html).
+
+Unzip the archives, then you will get a data structure as follows:
+
+```
+Monkaa
+├── disparity
+└── frames_cleanpass
+```
+
+### Sceneflow - Driving
+
+Download [Images](https://lmb.informatik.uni-freiburg.de/data/SceneFlowDatasets_CVPR16/Release_april16/data/Driving/raw_data/driving__frames_cleanpass.tar.torrent) and [Disparities](https://lmb.informatik.uni-freiburg.de/data/SceneFlowDatasets_CVPR16/Release_april16/data/Driving/derived_data/driving__disparity.tar.bz2.torrent) from the [official website](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html).
+
+Unzip the archives, then you will get a data structure similar to the data structure of Monkaa.
+
+### Middlebury 2014 - MiddEval3 (Half resolution)
+
+Download [Images](https://vision.middlebury.edu/stereo/submit3/zip/MiddEval3-data-H.zip), [Left GT](https://vision.middlebury.edu/stereo/submit3/zip/MiddEval3-GT0-H.zip), [Right GT](https://vision.middlebury.edu/stereo/submit3/zip/MiddEval3-GT1-H.zip) from [Middlebury Website](https://vision.middlebury.edu/stereo/submit3/), then unzip the packages.
+
+After that, you will get a data structure as follows:
+
+```
+MiddEval3
+├── trainingH
+│   ├── Adirondack
+│   │   ├── im0.png
+│   │   ├── im1.png
+│   │   ├── mask0nocc.png
+│   │   └── disp0GT.pfm
+│   ├── ...
+│   └── Vintage
+└── testH
+```
+
+### Middlebury 2021
+
+Download the [Middlebury 2021 Archive](https://vision.middlebury.edu/stereo/data/scenes2021/zip/all.zip) from [Middlebury Website](https://vision.middlebury.edu/stereo/data/scenes2021/). Then download our [occlusion masks](https://drive.google.com/drive/folders/1uQqNJo2iWoPtXlSsv2koAt2OPYHpuh1x?usp=sharing) obtained using LRC. After that, unzip all archives.
+
+You will get a data structure similar to MiddEval3.
+
+### ETH3D
+
+You can download [ETH3D](https://www.eth3d.net/datasets#low-res-two-view-training-data) dataset following this script:
+
+```bash
+$ cd PATH_TO_DOWNLOAD
+$ wget https://www.eth3d.net/data/two_view_training.7z
+$ wget https://www.eth3d.net/data/two_view_training_gt.7z
+$ p7zip -d *.7z
+```
+
+After that, you will get a data structure as follows:
+
+```
+eth3d
+├── delivery_area_1l
+│    ├── im0.png
+│    └── ...
+...
+└── terrains_2s
+     └── ...
+```
+Note that the script erases 7z files. Further details are available at the [official website](https://www.eth3d.net/datasets).
+
+### KITTI 2012
+
+Go to [official KITTI 2012 website](https://www.cvlibs.net/datasets/kitti/eval_stereo_flow.php?benchmark=stereo), then using a registered account you will be able to download the stereo 2012 dataset.
+
+After that, you need to add some symbolic links:
+
+```bash
+cd KITTI2012_PATH
+cd training
+
+ln -s colored_0 image_2
+ln -s colored_1 image_3
+ln -s disp_noc disp_noc_0
+ln -s disp_occ disp_occ_0
+```
+
+You will get a data structure similar to KITTI 2015.
+
+### KITTI 2015
+
+Go to [official KITTI 2015 website](https://www.cvlibs.net/datasets/kitti/eval_scene_flow.php?benchmark=stereo), then using a registered account you will be able to download the stereo 2015 dataset.
+
+After that, you will get a data structure as follows:
+
+```
+kitti2015
+└── training
+    ├── disp_occ_0
+    │    ├── 000000_10.png
+    |    ...
+    │    └── 000199_10.png
+    ├── disp_noc_0
+    ├── image_2
+    └── image_3
+```
+
+### Booster
+
+You can download Booster dataset from [AMSActa](https://amsacta.unibo.it/id/eprint/6876/) (Booster Dataset Labeled - 19GB). Please refer to the [official website](https://cvlab-unibo.github.io/booster-web/) for further details. After that, unzip the archive to your preferred folder.
+
+You will get a data structure as follows:
+
+```
+Booster
+├── test
+└── train
+    ├── unbalanced
+    └── balanced
+         ├── Bathroom
+         ...
+         └── Washer
+```
+
+### LayeredFlow
+
+You can download [LayeredFlow](https://drive.google.com/file/d/1EEFp7AE8ZX75ADztP74Mx7VZ6MOymneN/view) dataset from the [official website](https://layeredflow.cs.princeton.edu/).
+
+Unzip the archive, then you will get a data structure as follows:
+
+```
+public_layeredflow_benchmark
+├── calib
+├── test
+└── val
+    ├── 0
+    ...
+    └── 199
+```
+
+### MonoTrap
+
+You can download our MonoTrap dataset from our [drive](https://drive.google.com/drive/folders/1uQqNJo2iWoPtXlSsv2koAt2OPYHpuh1x?usp=sharing).
+
+Unzip the archive, then you will get a data structure as follows:
+
+```
+MonoTrap
+└── validation
+    ├── RealTrap
+    └── CraftedTrap
+```
 
 ## :train2: Training
 
@@ -94,7 +274,7 @@ We will provide futher information to train Stereo Anywhere soon.
 
 ## :rocket: Test
 
-Evaluation command example:
+To evaluate StereoAnywhere with all datasets except MonoTrap use this snippet:
 
 ```bash
 python test.py --datapath <DATAPATH> --dataset <DATASET> \ 
@@ -106,7 +286,19 @@ python test.py --datapath <DATAPATH> --dataset <DATASET> \
 --mirror_conf_th 0.98  --use_truncate_vol --mirror_attenuation 0.9 
 ```
 
-We will provide futher information to test Stereo Anywhere soon.
+where `DATAPATH` is the path to the dataset, `DATASET` is the name of the dataset (i.e., `middlebury`, `middlebury2021`, `eth3d`, `kitti2012`, `kitti2015`, `booster`, `layeredflow`), `STEREO_MODEL_PATH` is the path to our pretrained sceneflow checkpoint, `MONO_MODEL_PATH` is the path to the DAv2-Large pretrained monocular model, `ISCALE` is the resolution of input images (use 4 for Booster, 8 for LayeredFlow, 1 for others), `OSCALE` is the resolution of evaluation (use 4 for Booster, 8 for LayeredFlow, 1 for others).
+
+To evaluate StereoAnywhere with our MonoTrap dataset use this snippet:
+
+```bash
+python test_monotrap.py --datapath <DATAPATH> \ 
+--stereomodel stereoanywhere --loadstereomodel <STEREO_MODEL_PATH> \
+--monomodel DAv2 --loadmonomodel <MONO_MODEL_PATH> \
+--iscale <ISCALE> --oscale <OSCALE> --normalize --iters 32 \
+--vol_n_masks 8 --n_additional_hourglass 0 \
+--use_aggregate_mono_vol --vol_downsample 0 \
+--mirror_conf_th 0.98  --use_truncate_vol --mirror_attenuation 0.9 
+```
 
 ## :art: Qualitative Results
 

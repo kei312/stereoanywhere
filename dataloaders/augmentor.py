@@ -16,7 +16,7 @@ import torch.nn.functional as F
 
 
 class DisparityAugmentor:
-    def __init__(self, crop_size, min_scale=-0.2, max_scale=0.5, asym=0.2, do_flip=True):
+    def __init__(self, crop_size, min_scale=-0.2, max_scale=0.5, asym=0.3, do_flip=True):
         
         # spatial augmentation params
         self.crop_size = crop_size
@@ -29,31 +29,30 @@ class DisparityAugmentor:
 
         # flip augmentation params
         self.do_flip = do_flip
-        # self.h_flip_prob = 0.5
-        self.v_flip_prob = 0.5
-        self.all_image_prob = 0.01
+        self.h_flip_prob = 0.1
+        self.v_flip_prob = 0.1
+        self.all_image_prob = 0.0
 
         # photometric augmentation params
         # self.photo_aug = ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.5/3.14)
 
         self.photo_aug = A.Compose([  
-                A.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.5/3.14, p=0.5),
+                #A.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.5/3.14, p=0.5),
                 A.RGBShift(p=0.5),
                 A.ChannelDropout(p=0.1),
-                #A.Equalize(p=0.1),
-                #A.HueSaturationValue(p=0.5),
-                A.ChannelShuffle(p=0.5),
-                #A.RandomBrightnessContrast(p=1),
-                #A.RandomGamma(p=0.1), 
-                #A.MotionBlur(p=0.1),
-                #A.Blur(p=0.2),
+                A.Equalize(p=0.1),
+                A.HueSaturationValue(p=0.5),
+                A.ChannelShuffle(p=0.2),
+                A.RandomBrightnessContrast(p=1),
+                A.RandomGamma(p=0.1), 
+                A.MotionBlur(p=0.1),
+                A.Blur(p=0.2),
                 A.ToGray(p=0.1),
-                A.MedianBlur(3, p=0.1),
+                A.MedianBlur(p=0.1),
                 A.ImageCompression(p=0.1),
-                #A.RandomGamma(p=0.2), 
                 A.GaussNoise(p=0.1),
-                #A.GaussianBlur(p=0.1),
-                #A.CLAHE(p=0.1),    
+                A.GaussianBlur(p=0.1),
+                A.CLAHE(p=0.1),    
             ], p= 1)
 
         self.asymmetric_color_aug_prob = asym
@@ -117,17 +116,27 @@ class DisparityAugmentor:
 
         # disabled, to be implemented
         if self.do_flip:
-            # if np.random.rand() < self.h_flip_prob: # h-flip
-            #     tmp = im2[:, ::-1]
-            #     im2 = im3[:, ::-1]
-            #     im3 = tmp
-            #     if gt2 is not None:
-            #         gt2 = gt2[:, ::-1]
-            #         validgt2 = validgt2[:, ::-1]
+            if np.random.rand() < self.h_flip_prob and gt2 is not None and gt3 is not None: # h-flip
+                tmp = im2[:, ::-1]
+                im2 = im3[:, ::-1]
+                im3 = tmp
+                
+                tmp = gt2[:, ::-1]
+                gt2 = gt3[:, ::-1]
+                gt3 = tmp
 
-            #     if gt3 is not None:
-            #         gt3 = gt3[:, ::-1]
-            #         validgt3 = validgt3[:, ::-1]                    
+                tmp = validgt2[:, ::-1]
+                validgt2 = validgt3[:, ::-1]       
+                validgt3 = tmp 
+
+                if im2_mono is not None and im3_mono is not None:
+                    tmp = im2_mono[:, ::-1]
+                    im2_mono = im3_mono[:, ::-1]
+                    im3_mono = tmp
+
+                #not correct, however, not used during training
+                if maskocc is not None:
+                    maskocc = maskocc[:, ::-1]
 
             if np.random.rand() < self.v_flip_prob: # v-flip
                 im2 = np.flip(im2, axis=0)

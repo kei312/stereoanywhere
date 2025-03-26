@@ -25,33 +25,20 @@ class KITTIStereoDataset(BaseDataset):
     def load_sample(self, index):
         data = {}
 
-        data['im2'] = read_gen(self.image_list[index][1])
-        data['im3'] = read_gen(self.image_list[index][2])
-        
-        data['im2'] = np.array(data['im2']).astype(np.uint8)
-        data['im3'] = np.array(data['im3']).astype(np.uint8)
+        data['im2'] = np.array(read_gen(self.image_list[index][1])).astype(np.uint8)
+        data['im3'] = np.array(read_gen(self.image_list[index][2])).astype(np.uint8)
 
         if self.mono is not None:
-            data['im2_mono'] = read_mono(self.image_list[index][4])
-            data['im3_mono'] = read_mono(self.image_list[index][5])
-
-            data['im2_mono'] = np.expand_dims( data['im2_mono'].astype(np.float32), -1)
-            data['im3_mono'] = np.expand_dims( data['im3_mono'].astype(np.float32), -1)
+            data['im2_mono'] = np.expand_dims(read_mono(self.image_list[index][4]).astype(np.float32), -1)
+            data['im3_mono'] = np.expand_dims(read_mono(self.image_list[index][5]).astype(np.float32), -1)
 
         if self.is_test:
             data['im2'] = data['im2'] / 255.0
             data['im3'] = data['im3'] / 255.0
 
         # grayscale images
-        if len(data['im2'].shape) == 2:
-            data['im2'] = np.tile(data['im2'][...,None], (1, 1, 3))
-        else:
-            data['im2'] = data['im2'][..., :3]                
-
-        if len(data['im3'].shape) == 2:
-            data['im3'] = np.tile(data['im3'][...,None], (1, 1, 3))
-        else:
-            data['im3'] = data['im3'][..., :3]
+        data['im2'] = self.gray2rgb(data['im2'])
+        data['im3'] = self.gray2rgb(data['im3'])
 
         if os.path.exists(self.image_list[index][0]):
             data['gt'], data['validgt'] = readDispKITTI(self.image_list[index][0])
@@ -64,11 +51,14 @@ class KITTIStereoDataset(BaseDataset):
         else:
             data['maskocc'] = np.zeros_like(data['validgt']) 
 
-        data['maskocc'] = (data['validgt'] > 0) & (data['validgt'] - data['maskocc'] > 0) # 1 if occluded, 0 otherwise
+        if self.is_test:
+            data['maskocc'] = (data['validgt'] > 0) & (data['validgt'] - data['maskocc'] > 0) # 1 if occluded, 0 otherwise
+            data['maskocc'] = np.array(data['maskocc']).astype(np.uint8)
+        else:
+            data['maskocc'] = None
 
         data['gt'] = np.array(data['gt']).astype(np.float32)
         data['validgt'] = np.array(data['validgt']).astype(np.uint8)
-        data['maskocc'] = np.array(data['maskocc']).astype(np.uint8)
 
         data['gt_right'] = np.zeros_like(data['gt'])
         data['validgt_right'] = (data['gt_right']>0).astype(np.uint8)
@@ -93,6 +83,8 @@ class KITTIStereoDataset(BaseDataset):
                 
         #         if k in ['gt', 'gt_right']:
         #             data[k] = data[k] / self.scale_factor
+
+        data = self.rescale_data(data)        
         
         if self.is_test or self.augmentor is None:
             augm_data = data

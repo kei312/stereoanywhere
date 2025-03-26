@@ -41,7 +41,9 @@ parser.add_argument('--stereomodel', default='stereoanywhere',
 
 parser.add_argument('--datapath', default='dataset/oak_dataset/',
                     help='datapath')
-parser.add_argument('--dataset', default='middlebury', help='dataset type')
+
+#Fixed to monotrap
+parser.add_argument('--dataset', default='monotrap', help='dataset type')
 
 parser.add_argument('--outdir', default=None)           
 
@@ -64,7 +66,7 @@ parser.add_argument('--mixed_precision', action='store_true')
 
 parser.add_argument('--numworkers', type=int, default=1)
 parser.add_argument('--verbose', action='store_true')
-parser.add_argument('--errormetric', default='bad 3.0', choices=['bad 1.0', 'bad 2.0', 'bad 3.0', 'bad 4.0', 'avgerr', 'rms'],
+parser.add_argument('--errormetric', default='rms', choices=['a1_105', 'avgerr', 'rms'],
                     help='metric for errormap text')
 parser.add_argument('--dilation', type=int, default=1)
 parser.add_argument('--normalize', action='store_true')
@@ -100,6 +102,7 @@ parser.add_argument('--iters', type=int, default=32, help='Number of iterations 
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
+args.dataset = 'monotrap'
 
 torch.manual_seed(args.seed)
 random.seed(args.seed)
@@ -170,6 +173,7 @@ def run(data):
         data['gt'] = F.interpolate(data['gt'], scale_factor=1./args.oscale, mode='nearest') / args.oscale
         data['validgt'] = F.interpolate(data['validgt'], scale_factor=1./args.oscale, mode='nearest')
         data['maskocc'] = F.interpolate(data['maskocc'], scale_factor=1./args.oscale, mode='nearest')
+        data['gt_depth'] = F.interpolate(data['gt_depth'], scale_factor=1./args.oscale, mode='nearest')
 
     if args.cuda:
         data['im2'], data['im3'] = data['im2'].to(device), data['im3'].to(device)
@@ -185,9 +189,9 @@ def run(data):
     with autocast(autocast_device, enabled=args.mixed_precision):
         if args.monomodel == 'DAv2':
             #Assume batch size = 1 only for testing
-            _input_size_width_dict = {'kitti2012': 1372, 'kitti2015': 1372, 'eth3d': 518, 'middlebury': 518*2, 'middlebury2021': 1372, 'booster': 518*2, 'layeredflow': 952}
+            _input_size_width_dict = {'kitti2012': 1372, 'kitti2015': 1372, 'eth3d': 518, 'middlebury': 518*2, 'middlebury2021': 1372, 'booster': 518*2, 'layeredflow': 952, 'monotrap': 518}
             _input_size_width = _input_size_width_dict[args.dataset] if args.dataset in _input_size_width_dict else 518
-            _input_size_height_dict = {'kitti2012': 518, 'kitti2015': 518, 'eth3d': 518, 'middlebury': 518*2, 'middlebury2021': 770, 'booster': 756, 'layeredflow': 532}
+            _input_size_height_dict = {'kitti2012': 518, 'kitti2015': 518, 'eth3d': 518, 'middlebury': 518*2, 'middlebury2021': 770, 'booster': 756, 'layeredflow': 532, 'monotrap': 518}
             _input_size_height = _input_size_height_dict[args.dataset] if args.dataset in _input_size_height_dict else 518
             mono_depths = mono_model.infer_image(torch.cat([data['im2'], data['im3']], 0), input_size_width=_input_size_width, input_size_height=_input_size_height)
             #Normalize depth between 0 and 1
@@ -237,10 +241,19 @@ def run(data):
 
     result = {}
 
-    if 'gt' in data:
-        result = guided_metrics(pred_disp.detach().cpu().numpy(), data['gt'].detach().cpu().numpy(), data['validgt'].detach().cpu().numpy(), data['maskocc'].detach().cpu().numpy())
+    #WARNING: Hardcoded for MonoTrap
+    baseline = 0.075
+    K = 450.0487976074219
+    _depth = pred_disp.squeeze().cpu().numpy()
+    _depth[_depth>0] = (K*baseline) / _depth[_depth>0]
+
+    _gt_depth = data['gt_depth'].squeeze().cpu().numpy()
+    _depth = np.clip(_depth, 0, _gt_depth.max())
+
+    result = depth_metrics(_depth, _gt_depth, data['validgt'].squeeze().cpu().numpy())
 
     result['disp'] = pred_disp
+    result['depth'] = _depth
 
     return result
 

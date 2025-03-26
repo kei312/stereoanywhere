@@ -9,7 +9,7 @@ from .frame_utils import *
 from .augmentor import DisparityAugmentor
 
 class BaseDataset(data.Dataset):
-    def __init__(self, datapath, aug_params=None, test=False, overfit=False, seed=0, mono=None, multiplier=1, scale_factor=1.0, top_crop = 0):
+    def __init__(self, datapath, aug_params=None, test=False, overfit=False, seed=0, mono=None, multiplier=1, scale_factor=1, top_crop = 0):
         self.augmentor = DisparityAugmentor(**aug_params) if aug_params else None
         self.is_test = test
         self.seed = seed
@@ -32,6 +32,31 @@ class BaseDataset(data.Dataset):
         if multiplier > 1:
             self.image_list *= multiplier
             self.extra_info *= multiplier
+
+    def gray2rgb(self, im):
+        if len(im.shape) == 2:
+            im = np.tile(im[...,None], (1, 1, 3))
+        else:
+            im = im[..., :3]                
+
+        return im
+    
+    def rescale_data(self, data):
+        if self.scale_factor != 1:
+            scale_factor = float(self.scale_factor)
+            for k in data:
+                if data[k] is not None:
+                    if k not in ['gt', 'gt_right', 'validgt', 'validgt_right', 'maskocc', 'maskcat']:
+                        data[k] = cv2.resize(data[k], (int(data[k].shape[1]/scale_factor), int(data[k].shape[0]/scale_factor)), interpolation=cv2.INTER_LINEAR)
+                    else:
+                        data[k] = cv2.resize(data[k], (int(data[k].shape[1]/scale_factor), int(data[k].shape[0]/scale_factor)), interpolation=cv2.INTER_NEAREST)
+
+                    if len(data[k].shape) == 2:
+                        data[k] = np.expand_dims(data[k], -1)
+
+                    if k in ['gt', 'gt_right']:
+                        data[k] = data[k] / scale_factor
+        return data
     
     def load_data(self, datapath):
         """To be implemented by subclasses."""

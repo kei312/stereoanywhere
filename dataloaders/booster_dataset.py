@@ -31,34 +31,21 @@ class BoosterDataset(BaseDataset):
     
     def load_sample(self, index):
         data = {}
-
-        data['im2'] = read_gen(self.image_list[index][0])
-        data['im3'] = read_gen(self.image_list[index][1])
         
-        data['im2'] = np.array(data['im2']).astype(np.uint8)
-        data['im3'] = np.array(data['im3']).astype(np.uint8)
+        data['im2'] = np.array(read_gen(self.image_list[index][0])).astype(np.uint8)
+        data['im3'] = np.array(read_gen(self.image_list[index][1])).astype(np.uint8)
 
         if self.mono is not None:
-            data['im2_mono'] = read_mono(self.image_list[index][7])
-            data['im3_mono'] = read_mono(self.image_list[index][8])
-
-            data['im2_mono'] = np.expand_dims( data['im2_mono'].astype(np.float32), -1)
-            data['im3_mono'] = np.expand_dims( data['im3_mono'].astype(np.float32), -1)
+            data['im2_mono'] = np.expand_dims( read_mono(self.image_list[index][7]).astype(np.float32), -1)
+            data['im3_mono'] = np.expand_dims( read_mono(self.image_list[index][8]).astype(np.float32), -1)
 
         if self.is_test:
             data['im2'] = data['im2'] / 255.0
             data['im3'] = data['im3'] / 255.0
 
         # grayscale images
-        if len(data['im2'].shape) == 2:
-            data['im2'] = np.tile(data['im2'][...,None], (1, 1, 3))
-        else:
-            data['im2'] = data['im2'][..., :3]                
-
-        if len(data['im3'].shape) == 2:
-            data['im3'] = np.tile(data['im3'][...,None], (1, 1, 3))
-        else:
-            data['im3'] = data['im3'][..., :3]
+        data['im2'] = self.gray2rgb(data['im2'])
+        data['im3'] = self.gray2rgb(data['im3'])
 
         data['gt'] = np.load(self.image_list[index][2])
         data['validgt'] = (data['gt']>0).astype(np.uint8)
@@ -72,26 +59,17 @@ class BoosterDataset(BaseDataset):
         data['gt_right'] = np.expand_dims( np.array(data['gt_right']).astype(np.float32), -1)
         data['validgt_right'] = np.expand_dims( np.array(data['validgt_right']).astype(np.uint8), -1)
         
-        data['maskocc'] = np.expand_dims( np.array(read_gen(self.image_list[index][4])).astype(np.uint8), -1)
-        data['maskocc'] = np.where(data['maskocc'] == 0, 1, 0)# 1 if occluded, 0 otherwise
-        data['maskocc'] = np.array(data['maskocc']).astype(np.uint8)
+        if self.is_test:
+            data['maskocc'] = np.expand_dims( np.array(read_gen(self.image_list[index][4])).astype(np.uint8), -1)
+            data['maskocc'] = np.where(data['maskocc'] == 0, 1, 0)# 1 if occluded, 0 otherwise
+            data['maskocc'] = np.array(data['maskocc']).astype(np.uint8)
+        else:
+            data['maskocc'] = None
 
         # data['maskcat'] = np.expand_dims( np.array(read_gen(self.image_list[index][5])).astype(np.uint8), -1)
-
         # resize_factor = self.image_list[index][6]
 
-        for k in data:
-            if data[k] is not None:
-                if k not in ['gt', 'gt_right', 'validgt', 'validgt_right', 'maskocc', 'maskcat']:
-                    data[k] = cv2.resize(data[k], (int(data[k].shape[1]/self.scale_factor), int(data[k].shape[0]/self.scale_factor)), interpolation=cv2.INTER_LINEAR)
-                else:
-                    data[k] = cv2.resize(data[k], (int(data[k].shape[1]/self.scale_factor), int(data[k].shape[0]/self.scale_factor)), interpolation=cv2.INTER_NEAREST)
-
-                if len(data[k].shape) == 2:
-                    data[k] = np.expand_dims(data[k], -1)
-                
-                if k in ['gt', 'gt_right']:
-                    data[k] = data[k] / self.scale_factor
+        data = self.rescale_data(data)
         
         if self.is_test or self.augmentor is None:
             data['im2_aug'] = data['im2']
@@ -99,10 +77,7 @@ class BoosterDataset(BaseDataset):
         else:
             im2_mono = data['im2_mono'] if self.mono is not None else None
             im3_mono = data['im3_mono'] if self.mono is not None else None
-            augm_data = self.augmentor(data['im2'], data['im3'], im2_mono, im3_mono, gt2=data['gt'], validgt2=data['validgt'], gt3=data['gt_right'], validgt3=data['validgt_right'], maskocc=data['maskocc'])
-
-            for key in augm_data:
-                data[key] = augm_data[key]
+            data = self.augmentor(data['im2'], data['im3'], im2_mono, im3_mono, gt2=data['gt'], validgt2=data['validgt'], gt3=data['gt_right'], validgt3=data['validgt_right'], maskocc=data['maskocc'])
 
         for k in data:
             if data[k] is not None:

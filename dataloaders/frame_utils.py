@@ -140,6 +140,7 @@ def read_mono(filename):
 def read_gen(file_name, pil=False):
     ext = splitext(file_name)[-1]
     if ext == '.png' or ext == '.jpeg' or ext == '.ppm' or ext == '.jpg':
+        #return cv2.cvtColor(cv2.imread(file_name), cv2.COLOR_BGR2RGB) # will cause an exception reading maskocc
         return Image.open(file_name)
     elif ext == '.bin' or ext == '.raw':
         return np.load(file_name)
