@@ -165,6 +165,8 @@ class StereoAnywhere(nn.Module):
         agg_disp_mono_corr = self.classifier_mono(agg_mono_corr_volume)
         agg_conf_mono_corr = self.classifier_monoconf(agg_mono_corr_volume.detach())
 
+        del masked_mono_corr_volume, agg_mono_corr_volume
+
         if self.args.vol_downsample > 0:         
             agg_disp_mono_corr = F.interpolate(agg_disp_mono_corr, (_original_shape[2], _original_shape[3], _original_shape[4]), mode="trilinear", align_corners=True)
             agg_conf_mono_corr = F.interpolate(agg_conf_mono_corr, (_original_shape[2], _original_shape[3], _original_shape[4]), mode="trilinear", align_corners=True)            
@@ -174,7 +176,7 @@ class StereoAnywhere(nn.Module):
         coarse_ldispmonoconf2_lowres = estimate_left_confidence(agg_conf_mono_corr)
         coarse_ldispmonoconf3_lowres = estimate_right_confidence(agg_conf_mono_corr)
 
-        del masked_mono_corr_volume, agg_mono_corr_volume, agg_conf_mono_corr
+        del agg_conf_mono_corr
 
         coarse_dispmono2 = F.interpolate(coarse_dispmono2_lowres, scale_factor=(2**self.args.n_downsample), mode="bilinear", align_corners=True) * (2**self.args.n_downsample)
         coarse_dispmono3 = F.interpolate(coarse_dispmono3_lowres, scale_factor=(2**self.args.n_downsample), mode="bilinear", align_corners=True) * (2**self.args.n_downsample)

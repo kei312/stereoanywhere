@@ -215,6 +215,12 @@ class DepthAnythingV2(nn.Module):
         
         final_w, final_h = resize.get_size(w,h)
 
+        # Alternative way: assume the input size is always multiple of 14
+        # assert input_size_width % 14 == 0, "input_size_width must be multiple of 14"
+        # assert input_size_height % 14 == 0, "input_size_height must be multiple of 14"
+        # final_w = input_size_width
+        # final_h = input_size_height
+
         if not isinstance(final_w, int):
             final_w = int(final_w)
         if not isinstance(final_h, int):

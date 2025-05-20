@@ -1,8 +1,16 @@
-<h1 align="center"> Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (CVPR 2025) </h1> 
+<h1 align="center" style="border-bottom: 0;"> Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail (CVPR 2025)</h1> 
 
-<h3 align="center"> Evaluation code released - MonoTrap released - training code coming soon </h3>
+<h3 align="center"> <b> Friday, June 13 from 10:30 to 12:30 - Poster Session 1 and Exhibit Hall (ExHall D) </b> </h3>
 
-<br>
+<!-- <h3 align="center"> Evaluation code released - MonoTrap released - training code coming soon </h3> -->
+
+<hr>
+
+<h1 align="center" style="border-bottom: 0;"> Robust Zero-Shot Depth Perception through Mono-Stereo Fusion (CVPR DEMO 2025) </h1>
+
+<h3 align="center"> <b> Saturday, June 14 from 17:00 to 19:00 - Demos (Hall D) </b> </h3>
+
+<hr>
 
 :rotating_light: This repository will contain download links to our code, and trained deep stereo models of our work  "**Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail**",  [CVPR 2025](http://arxiv.org/abs/2412.04472)
  
@@ -34,6 +42,7 @@ University of Bologna<sup>2</sup>
 - [:floppy_disk: Datasets](#floppy_disk-datasets)
 - [:train2: Training](#train2-training)
 - [:rocket: Test](#rocket-test)
+- [:video_camera: Practical Demo](#video_camera-practical-demo)
 - [:art: Qualitative Results](#art-qualitative-results)
 - [:envelope: Contacts](#envelope-contacts)
 - [:pray: Acknowledgements](#pray-acknowledgements)
@@ -299,6 +308,50 @@ python test_monotrap.py --datapath <DATAPATH> \
 --use_aggregate_mono_vol --vol_downsample 0 \
 --mirror_conf_th 0.98  --use_truncate_vol --mirror_attenuation 0.9 
 ```
+
+## :video_camera: Pratical Demo
+
+We will showcase our model with a live demo at CVPR 2025 using an OAK-D Lite stereo camera: we will showcase the performance of our model in challenging non-Lambertian environments, such as those containing mirrors or transparent surfaces.
+
+You can try it using a OAK-D Lite and with the `fast_demo_oak.py` script:
+
+```bash
+python fast_demo_oak.py \
+--stereomodel stereoanywhere --loadstereomodel <STEREO_MODEL_PATH> \ 
+--monomodel DAv2RT --loadmonomodel <ENGINE_MODEL_PATH> \ 
+--iscale <ISCALE> --iters 32 \ 
+--iters 32 --vol_n_masks 8 --volume_channels 8 --n_additional_hourglass 0 \
+--use_aggregate_mono_vol --vol_downsample 0 \ 
+--mirror_conf_th 0.98  --use_truncate_vol --mirror_attenuation 0.9
+```
+
+Before running the script please convert Depth Anything V2 to TensorRT following the official [guide](https://github.com/spacewalk01/depth-anything-tensorrt). 
+
+However,differently from the official repository, we utilized TensorRT 10.8:
+
+- Download CUDA 12 Toolkit from [Nvidia official website](https://developer.nvidia.com/cuda-downloads);
+- Download TensorRT 10.8 DEB package from [Nvidia official website](https://developer.nvidia.com/tensorrt/download/10x);
+- Download TensorRT 10.8 TAR package from [Nvidia official website](https://developer.nvidia.com/tensorrt/download/10x).
+
+The TAR package is necessary to compile the [converter](https://github.com/spacewalk01/depth-anything-tensorrt) from .onnx model to .engine model.
+
+Then, install additional python requirements using `python -m pip install -r requirements_demo.txt`
+
+If you don't have a OAK-D Lite camera, you can still try the demo using the `fast_demo.py` script:
+
+```bash
+python fast_demo.py \
+--left <LEFT_IMAGE_PATH> --right <RIGHT_IMAGE_PATH> --outdir <OUTPUT_PATH> \ 
+--stereomodel stereoanywhere --loadstereomodel <STEREO_MODEL_PATH> \ 
+--monomodel DAv2RT --loadmonomodel <ENGINE_MODEL_PATH> \ 
+--iscale <ISCALE> --iters 32 \ 
+--iters 32 --vol_n_masks 8 --volume_channels 8 --n_additional_hourglass 0 \ 
+--use_aggregate_mono_vol --vol_downsample 0 \ 
+--mirror_conf_th 0.98  --use_truncate_vol --mirror_attenuation 0.9 \ 
+--display_qualitatives --save_qualitatives
+```
+
+If you have problems with Out Of Memory exceptions, you can try to adjust the `--vol_downsample` or `--iscale` hyperparameters.
 
 ## :art: Qualitative Results
 

@@ -19,22 +19,24 @@ def colormap_image(x,vmax=None,cmap='Spectral_r'):
 def bilinear_sampler(img, coords, mode='bilinear', mask=False):
     """ Wrapper for grid_sample, uses pixel coordinates """
     H, W = img.shape[-2:]
+    img_dtype = img.dtype
+
     xgrid, ygrid = coords.split([1,1], dim=-1)
     xgrid = 2*xgrid/(W-1) - 1
     assert torch.unique(ygrid).numel() == 1 and H == 1 # This is a stereo problem
 
     grid = torch.cat([xgrid, ygrid], dim=-1)
-    img = F.grid_sample(img, grid, align_corners=True)
+    img = F.grid_sample(img.float(), grid, align_corners=True).to(img_dtype)
 
     if mask:
         mask = (xgrid > -1) & (ygrid > -1) & (xgrid < 1) & (ygrid < 1)
-        return img, mask.float()
+        return img, mask.to(img_dtype)
 
     return img
 
-def coords_grid(batch, ht, wd, dtype=None, device=None):
+def coords_grid(batch, ht, wd, dtype, device):
     coords = torch.meshgrid(torch.arange(ht, dtype=dtype, device=device), torch.arange(wd, dtype=dtype, device=device), indexing='ij')
-    coords = torch.stack(coords[::-1], dim=0).float()
+    coords = torch.stack(coords[::-1], dim=0).to(dtype).to(device)
     return coords[None].repeat(batch, 1, 1, 1).to(device) # B 2 H W
 
 def upflow(flow, factor=2, mode='bilinear', use_scale_factor = True):
@@ -213,6 +215,7 @@ def gauss_corr_volume_naive(disp_left, gauss_k = 10, gauss_c = 1):
 
 def truncate_corr_volume_v2(disp_left, conf_left, conf_th = 0.5, attenuation_gain = 0.1):
     B, _, H, W = disp_left.shape
+    disp_left_dtype = disp_left.dtype
 
     disp_values = torch.arange(0, W, dtype=disp_left.dtype, device=disp_left.device)
     disp_values_left = disp_values.view(1, 1, 1, -1).repeat(B, 1, 1, 1) # B 1 1 W/4
@@ -222,7 +225,7 @@ def truncate_corr_volume_v2(disp_left, conf_left, conf_th = 0.5, attenuation_gai
     mycoords_y = mycoords_y[None].repeat(B, 1, 1).to(disp_left.device)
 
     if conf_th is not None:
-        conf_left = (conf_left > conf_th).float()
+        conf_left = (conf_left > conf_th).to(disp_left_dtype)
     conf_left = conf_left.unsqueeze(4)       # B 1 H/4 W/4 1
 
     truncate_center = (mycoords_x.unsqueeze(1).unsqueeze(4)-disp_left.unsqueeze(4)) #B 1 H/4 W/4 1
@@ -268,13 +271,14 @@ def handcrafted_mirror_detector(stereo_disp, mono_disp, stereo_conf, mono_conf, 
 def corr(normals_left, normals_right):
     B, D, H, W2 = normals_left.shape
     _, _, _, W3 = normals_right.shape
+    normals_left_dtype = normals_left.dtype
 
     normals_left = normals_left.view(B, D, H, W2)
     normals_right = normals_right.view(B, D, H, W3)
 
     corr = torch.einsum('aijk,aijh->ajkh', normals_left, normals_right)
     corr = corr.reshape(B, H, W2, 1, W3).contiguous()
-    corr = corr / torch.sqrt(torch.tensor(D).float())
+    corr = (corr / torch.sqrt(torch.tensor(D))).to(normals_left_dtype)
     
     return corr.squeeze(3).unsqueeze(1) #torch.Size([B, H, W1, 1, W2]) -> B, 1, H, W1, W2
 
@@ -312,8 +316,9 @@ def normalized_depth_scale_and_shift(
     
     if min_quantile > 0.0 or max_quantile < 1.0:
         # compute quantiles
-        min_quantile = torch.quantile(target, min_quantile)
-        max_quantile = torch.quantile(target, max_quantile)
+        target_dtype = target.dtype
+        min_quantile = torch.quantile(target.float(), min_quantile).to(target_dtype)
+        max_quantile = torch.quantile(target.float(), max_quantile).to(target_dtype)
         mask = (target >= min_quantile) * (target <= max_quantile) * mask
 
     # system matrix: A = [[a_00, a_01], [a_10, a_11]]
@@ -339,8 +344,10 @@ def normalized_depth_scale_and_shift(
 
 def weighted_lsq(mde, disp, conf, min_quantile = 0.2, max_quantile = 0.9):
     B, _, _, _ = mde.shape
+    mde_dtype = mde.dtype
+
     # Weighted LSQ
-    mde, disp, conf = mde.reshape(B, -1), disp.reshape(B, -1), conf.reshape(B, -1)
+    mde, disp, conf = mde.reshape(B, -1).float(), disp.reshape(B, -1).float(), conf.reshape(B, -1).float()
 
     disp = F.relu(disp)
 
@@ -374,7 +381,7 @@ def weighted_lsq(mde, disp, conf, min_quantile = 0.2, max_quantile = 0.9):
         _scale_shift = torch.linalg.lstsq(A_matrix, B_matrix)[0].squeeze(2) # 1 x 2 x 1 -> 1 x 2,
         scale_shift[b] = _scale_shift.squeeze(0)
 
-    return scale_shift[:, 0:1].reshape(B,1,1,1), scale_shift[:, 1:2].reshape(B,1,1,1)
+    return scale_shift[:, 0:1].reshape(B,1,1,1).to(mde_dtype), scale_shift[:, 1:2].reshape(B,1,1,1).to(mde_dtype)
     
 def naive_scale_shift(mde, disp, conf, conf_th = 0.5):
     B, _, _, _ = mde.shape

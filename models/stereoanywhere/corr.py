@@ -60,11 +60,13 @@ class CorrBlockFast1D:
     def corr(fmap2, fmap3):
         B, D, H, W1 = fmap2.shape
         _, _, _, W2 = fmap3.shape
+        fmap2_dtype = fmap2.dtype
+
         fmap2 = fmap2.view(B, D, H, W1)
         fmap3 = fmap3.view(B, D, H, W2)
         corr = torch.einsum('aijk,aijh->ajkh', fmap2, fmap3)
         corr = corr.reshape(B, H, W1, 1, W2).contiguous()
-        return corr / torch.sqrt(torch.tensor(D).float())
+        return (corr / torch.sqrt(torch.tensor(D))).to(fmap2_dtype)
 
 #Cannot create correlation volume dynamically
 #class PytorchAlternateCorrBlock1D
@@ -93,6 +95,7 @@ class CorrBlock1D:
         coords = coords[:, :1].permute(0, 2, 3, 1) # B 2 H W -> B 1 H W -> B H W 1
         coords = coords + self.pad[0] # Real coords are shifted by pad[0]
         batch, h1, w1, _ = coords.shape
+        coords_dtype = coords.dtype
 
         out_pyramid = []
         for i in range(self.num_levels):
@@ -109,12 +112,13 @@ class CorrBlock1D:
             out_pyramid.append(corr)
 
         out = torch.cat(out_pyramid, dim=-1) # B H W' (2r+1)*num_levels
-        return out.permute(0, 3, 1, 2).contiguous().float()# B (2r+1)*num_levels H W'
+        return out.permute(0, 3, 1, 2).contiguous().to(coords_dtype)# B (2r+1)*num_levels H W'
 
     @staticmethod
     def corr(fmap2, fmap3):
         B, D, H, W2 = fmap2.shape
         _, _, _, W3 = fmap3.shape
+        fmap2_dtype = fmap2.dtype
 
         fmap2 = fmap2.view(B, D, H, W2)
         fmap3 = fmap3.view(B, D, H, W3)
@@ -125,6 +129,4 @@ class CorrBlock1D:
 
         corr = torch.einsum('aijk,aijh->ajkh', fmap2, fmap3)
         corr = corr.reshape(B, H, W2, 1, W3).contiguous()
-        corr = corr / torch.sqrt(torch.tensor(D).float())
-
-        return corr 
+        return (corr / torch.sqrt(torch.tensor(D))).to(fmap2_dtype)
