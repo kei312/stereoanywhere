@@ -309,7 +309,7 @@ python test_monotrap.py --datapath <DATAPATH> \
 --mirror_conf_th 0.98  --use_truncate_vol --mirror_attenuation 0.9 
 ```
 
-## :video_camera: Pratical Demo
+## :video_camera: Practical Demo
 
 We will showcase our model with a live demo at CVPR 2025 using an OAK-D Lite stereo camera: we will showcase the performance of our model in challenging non-Lambertian environments, such as those containing mirrors or transparent surfaces.
 
