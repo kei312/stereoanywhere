@@ -67,11 +67,13 @@ We introduce Stereo Anywhere, a novel stereo-matching framework that combines ge
 :fountain_pen: If you find this code useful in your research, please cite:
 
 ```bibtex
-@article{bartolomei2024stereo,
-  title={Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail},
-  author={Bartolomei, Luca and Tosi, Fabio and Poggi, Matteo and Mattoccia, Stefano},
-  booktitle = {Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year={2025}
+@InProceedings{Bartolomei_2025_CVPR,
+    author    = {Bartolomei, Luca and Tosi, Fabio and Poggi, Matteo and Mattoccia, Stefano},
+    title     = {Stereo Anywhere: Robust Zero-Shot Deep Stereo Matching Even Where Either Stereo or Mono Fail},
+    booktitle = {Proceedings of the Computer Vision and Pattern Recognition Conference (CVPR)},
+    month     = {June},
+    year      = {2025},
+    pages     = {1013-1027}
 }
 ```
 
