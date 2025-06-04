@@ -313,9 +313,10 @@ python test_monotrap.py --datapath <DATAPATH> \
 
 We will showcase our model with a live demo at CVPR 2025 using an OAK-D Lite stereo camera: we will showcase the performance of our model in challenging non-Lambertian environments, such as those containing mirrors or transparent surfaces.
 
-You can try it using a OAK-D Lite and with the `fast_demo_oak.py` script:
+You can try it using a OAK-D Lite and with the `demo/fast_demo_oak.py` script:
 
 ```bash
+cd demo
 python fast_demo_oak.py \
 --stereomodel stereoanywhere --loadstereomodel <STEREO_MODEL_PATH> \ 
 --monomodel DAv2RT --loadmonomodel <ENGINE_MODEL_PATH> \ 
@@ -337,9 +338,10 @@ The TAR package is necessary to compile the [converter](https://github.com/space
 
 Then, install additional python requirements using `python -m pip install -r requirements_demo.txt`
 
-If you don't have a OAK-D Lite camera, you can still try the demo using the `fast_demo.py` script:
+If you don't have a OAK-D Lite camera, you can still try the demo using the `demo/fast_demo.py` script:
 
 ```bash
+cd demo
 python fast_demo.py \
 --left <LEFT_IMAGE_PATH> --right <RIGHT_IMAGE_PATH> --outdir <OUTPUT_PATH> \ 
 --stereomodel stereoanywhere --loadstereomodel <STEREO_MODEL_PATH> \ 
