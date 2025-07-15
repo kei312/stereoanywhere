@@ -50,8 +50,8 @@ class MonoTrapDataset(BaseDataset):
         data['gt_depth'][_gt_mask < 128] = 0
         data['validgt_depth'][_gt_mask < 128] = 0
         
-        data['maskocc'] = np.expand_dims(np.zeros_like(data['validgt']), -1)
-        data['maskocc'] = np.array(data['maskocc']).astype(np.uint8)
+        #data['maskocc'] = np.expand_dims(np.zeros_like(data['validgt']), -1)
+        # data['maskocc'] = np.array(data['maskocc']).astype(np.uint8)
 
         if self.is_test:
             data['gt_right'] = np.zeros_like(data['gt'])
@@ -67,7 +67,7 @@ class MonoTrapDataset(BaseDataset):
         else:
             im2_mono = data['im2_mono'] if self.mono is not None else None
             im3_mono = data['im3_mono'] if self.mono is not None else None
-            augm_data = self.augmentor(data['im2'], data['im3'], im2_mono, im3_mono, gt2=data['gt'], validgt2=data['validgt'], maskocc=data['maskocc'], gt3=data['gt_right'], validgt3=data['validgt_right'])
+            augm_data = self.augmentor(data['im2'], data['im3'], im2_mono, im3_mono, gt2=data['gt'], validgt2=data['validgt'], maskocc=None, gt3=data['gt_right'], validgt3=data['validgt_right'])
 
             for key in augm_data:
                 data[key] = augm_data[key]
