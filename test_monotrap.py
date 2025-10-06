@@ -81,6 +81,8 @@ parser.add_argument('--monomodel', default='DAv2',
 parser.add_argument('--loadmonomodel', default= None,
                     help='load model')
 
+parser.add_argument('--vit_encoder', default='vitl', choices=['vitl', 'vitb', 'vits'], help='select vit encoder (Only for DAv2)')
+
 parser.add_argument('--overfit', action='store_true', default=False,
                     help='overfit')
 
@@ -130,7 +132,7 @@ else:
     exit()
 
 if args.monomodel == 'DAv2':
-    mono_model = get_depth_anything_v2(args.loadmonomodel)
+    mono_model = get_depth_anything_v2(args.loadmonomodel, encoder=args.vit_encoder)
     mono_model = mono_model.to(device)
     mono_model.eval()
 elif args.monomodel == 'none':
