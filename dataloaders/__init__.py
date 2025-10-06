@@ -8,6 +8,9 @@ from .middlebury2021_dataset import Middlebury2021Dataset
 from .kittistereo_dataset import KITTIStereoDataset
 from .booster_dataset import BoosterDataset
 from .layeredflow_dataset import LayeredFlowDataset
+from .flyingthings_dataset import FlyingThingsDataset
+from .monkaa_dataset import MonkaaDataset
+from .driving_dataset import DrivingDataset
 from .monotrap_dataset import MonoTrapDataset
 
 def worker_init_fn(worker_id):                                                          
@@ -44,6 +47,27 @@ def fetch_dataloader(args):
             print('Testing with %d image pairs' % len(dataset))
         else:
             raise NotImplementedError    
+        
+    elif args.dataset == 'sceneflow':
+        _mono_model = args.monomodel if args.preload_mono else None
+        datapaths = args.datapath.split(";")
+        if args.test:
+            dataset1 = FlyingThingsDataset(datapaths[0],test=True, mono=_mono_model,overfit=args.overfit)
+            dataset2 = MonkaaDataset(datapaths[1],test=True, mono=_mono_model,overfit=args.overfit)
+            dataset3 = DrivingDataset(datapaths[2],test=True, mono=_mono_model,overfit=args.overfit)
+            dataset = dataset1+dataset2+dataset3
+            loader = data.DataLoader(dataset, batch_size=args.batch_size, 
+                pin_memory=False, shuffle=False, num_workers=args.numworkers, drop_last=True)
+            print(f'Testing using {args.dataset} with {len(dataset)} ({len(dataset1)}+{len(dataset2)}+{len(dataset3)}) image pairs')
+        else:
+            d_aug_params = {'crop_size': args.image_size, 'min_scale': -0.2, 'max_scale': 0.2, 'do_flip': True}
+            dataset1 = FlyingThingsDataset(datapaths[0],d_aug_params,overfit=args.overfit, mono=_mono_model)
+            dataset2 = MonkaaDataset(datapaths[1],d_aug_params,overfit=args.overfit, mono=_mono_model)
+            dataset3 = DrivingDataset(datapaths[2],d_aug_params,overfit=args.overfit, mono=_mono_model)
+            dataset =  dataset1+dataset2+dataset3 
+            loader = data.DataLoader(dataset, batch_size=args.batch_size, 
+                pin_memory=False, shuffle=True, num_workers=args.numworkers, drop_last=True, worker_init_fn = worker_init_fn)
+            print(f'Training using {args.dataset} with {len(dataset)} ({len(dataset1)}+{len(dataset2)}+{len(dataset3)}) image pairs')
 
     return loader
             

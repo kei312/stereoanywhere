@@ -171,6 +171,22 @@ MiddEval3
 
 Download the [Middlebury 2021 Archive](https://vision.middlebury.edu/stereo/data/scenes2021/zip/all.zip) from [Middlebury Website](https://vision.middlebury.edu/stereo/data/scenes2021/). Then download our [occlusion masks](https://drive.google.com/drive/folders/1uQqNJo2iWoPtXlSsv2koAt2OPYHpuh1x?usp=sharing) obtained using LRC. After that, unzip all archives.
 
+Now create symbolic links to recreate the structure of MiddEval3 dataset:
+
+```bash
+
+cd MIDDLEBURY2021_PATH
+
+# for each sequence -- i.e., artroom1, artroom2, ...., traproom2
+for i in *
+do
+    cd $i
+    ln -s disp0.pfm disp0GT.pfm
+    ln -s disp1.pfm disp1GT.pfm
+    cd ..
+done
+```
+
 You will get a data structure similar to MiddEval3.
 
 ### ETH3D
@@ -281,7 +297,14 @@ MonoTrap
 
 ## :train2: Training
 
-We will provide futher information to train Stereo Anywhere soon.
+You can use our script `run_train.sh` to train our model using the Sceneflow dataset (please set environment and datasets path correctly).
+Before launching the training script, preprocess Sceneflow images with our `mono_sceneflow.py` script:
+
+```bash
+python mono_sceneflow.py --datapath <SCENEFLOW_PATH> --monomodel DAv2 --loadmonomodel <MONO_MODEL_PATH>
+```
+
+where `SCENEFLOW_PATH` is the path to the folder that contains FlyingThings_subset, Monkaa, Driving, and `MONO_MODEL_PATH` is the path to the pretrained DAv2-Large checkpoint.
 
 ## :rocket: Test
 
