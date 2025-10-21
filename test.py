@@ -79,6 +79,8 @@ parser.add_argument('--monomodel', default='DAv2',
 parser.add_argument('--loadmonomodel', default= None,
                     help='load model')
 
+parser.add_argument('--preload_mono', action='store_true', help='Preload monocular model')
+
 parser.add_argument('--vit_encoder', default='vitl', choices=['vitl', 'vitb', 'vits'], help='select vit encoder (Only for DAv2)')
 
 parser.add_argument('--overfit', action='store_true', default=False,
